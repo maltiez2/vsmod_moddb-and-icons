@@ -162,20 +162,23 @@ def run_moddb_export(selected_folder, paths):
 
 def process_moddb_images(paths):
     output_dir = paths["output_dir"]
-    crop_file  = os.path.join(output_dir, "moddb-logo.png")
     scale_file = os.path.join(output_dir, "moddb-thumbnail.png")
 
-    # Crop moddb-logo from 1920x1280 to 1920x1080
-    if not os.path.isfile(crop_file):
-        print(f"[WARN] {crop_file} not found, skipping crop.")
-    else:
-        print(f"\n[INFO] Cropping {crop_file}...")
-        img         = Image.open(crop_file)
-        top         = (1280 - 1080) // 2
-        bottom      = top + 1080
-        img_cropped = img.crop((0, top, 1920, bottom))
-        img_cropped.save(crop_file)
-        print(f"[INFO] Cropped to {img_cropped.size[0]}x{img_cropped.size[1]}")
+    for crop_file in [f for f in os.listdir(output_dir) if os.path.isfile(os.path.join(output_dir, f))]:
+        if crop_file == "moddb-thumbnail.png" or crop_file == "modicon.png":
+            continue
+        crop_file = os.path.join(output_dir, crop_file)
+        # Crop image from 1920x1280 to 1920x1080
+        if not os.path.isfile(crop_file):
+            print(f"[WARN] {crop_file} not found, skipping crop.")
+        else:
+            print(f"\n[INFO] Cropping {crop_file}...")
+            img         = Image.open(crop_file)
+            top         = (1280 - 1080) // 2
+            bottom      = top + 1080
+            img_cropped = img.crop((0, top, 1920, bottom))
+            img_cropped.save(crop_file)
+            print(f"[INFO] Cropped to {img_cropped.size[0]}x{img_cropped.size[1]}")
 
     # Scale moddb-thumbnail from 1920x1280 to 480x320
     if not os.path.isfile(scale_file):
